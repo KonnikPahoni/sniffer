@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  database_data:
+    image: postgres:13
+    environment:
+      POSTGRES_USER : "postgres"
+      POSTGRES_PASSWORD : "postgres"
+    volumes:
+      - ./var/postgresql:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+  redis:
+    image: "redis:alpine"
+    volumes:
+      - ./var/redis:/var/redis
+    ports:
+      - "6379:6379"
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app_image
+    command: python main.py
+    volumes:
+      - ./var/app:/var/app
+    depends_on:
+      - database_data
+      - redis
+  celery:
+    image: app_image
+    command: celery -A celery worker -l info
+    env_file:
+      - .env
+    volumes:
+      - ./var/celery:/var/celery
+    depends_on:
+      - database_data
+    links:
+      - redis
+  celery-beat:
+    image: app_image
+    command: celery -A celery beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./var/celery-beat:/var/celery-beat
+    env_file:
+      - .env
+    depends_on:
+      - database_data
+      - redis
+      - app
