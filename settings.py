@@ -81,4 +81,4 @@ INSTALLED_APPS = ("data_getter", "django_celery_beat",)
 
 DEBUG = True
 
-# django.setup()
+django.setup()

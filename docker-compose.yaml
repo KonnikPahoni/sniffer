@@ -41,7 +41,7 @@ services:
       - redis
   celery-beat:
     image: app_image
-    command: celery -A celery beat -l info -S django_celery_beat.schedulers:DatabaseScheduler
+    command: celery -A data_getter.celery beat -l info -S django_celery_beat.schedulers:DatabaseScheduler
     volumes:
       - ./var/celery-beat:/var/celery-beat
     env_file:
