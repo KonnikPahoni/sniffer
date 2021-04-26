@@ -1,4 +1,4 @@
-from .celery import app as celery_app
+from .celery import celery as celery_app
 from celery.schedules import crontab
 import logging
 from .mappers.bfxticker import BFXTickerGetter

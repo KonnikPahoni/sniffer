@@ -1,9 +1,9 @@
 from .common import Getter
 from data_getter.schemas.bfx import BFXTickerTradingModel, BFXTickerFundingModel
-from data_getter.celery import app as celery_app
+from data_getter.celery import celery
 
 
-# @celery_app.task(bind=True)
+# @celery.task(bind=True)
 class BFXTickerGetter(Getter):
     url = "https://api-pub.bitfinex.com/v2/tickers?symbols=ALL"
 
