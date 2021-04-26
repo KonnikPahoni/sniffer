@@ -23,11 +23,10 @@ if os.path.exists(os.path.join(BASE_DIR, ".env")):
 #     env.read_env(os.path.join(BASE_DIR, ".env.local"))
 
 CELERY_BROKER_URL = os.environ['CELERY_BROKER_URL']
-CELERY_INCLUDE = os.environ['CELERY_INCLUDE']
+# CELERY_INCLUDE = ["data_getter.tasks"]
 CELERY_RESULT_BACKEND = os.environ['CELERY_RESULT_BACKEND']
 
 CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-
 CELERY_TIMEZONE = 'UTC'
 
 CELERYBEAT_SCHEDULE = {
@@ -78,8 +77,8 @@ LOGGING_LEVEL_CONSOLE = logging.DEBUG
 LOGGING_LEVEL_FILE = logging.INFO
 LOGGING_LEVEL_TELEGRAM = logging.INFO
 
-INSTALLED_APPS = ["data_getter", "django_celery_beat"]
+INSTALLED_APPS = ("data_getter", "django_celery_beat",)
 
 DEBUG = True
 
-django.setup()
+# django.setup()
