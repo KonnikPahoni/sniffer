@@ -23,9 +23,10 @@ if os.path.exists(os.path.join(BASE_DIR, ".env")):
 #     env.read_env(os.path.join(BASE_DIR, ".env.local"))
 
 CELERY_BROKER_URL = os.environ['CELERY_BROKER_URL']
-# CELERY_INCLUDE = ["data_getter.tasks"]
 CELERY_RESULT_BACKEND = os.environ['CELERY_RESULT_BACKEND']
-
+CELERY_TASK_SERIALIZER = "pickle"
+CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_ACCEPT_CONTENT = ['pickle']
 CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_TIMEZONE = 'UTC'
 

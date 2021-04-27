@@ -34,13 +34,13 @@ class Getter:
         return None
 
     def invoke(self):
-        logging.info("invoke")
+        logging.info("invoke bfx")
         self.response = self.get()
         if self.response:
             print("response received")
             try:
-                self.objects = self.map()
+                self.objects = list(self.map())
             except Exception:
                 raise ObjectCreationException
 
-            self.add_to_queue()
+            return self.objects
