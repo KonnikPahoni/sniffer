@@ -1,16 +1,14 @@
 from settings import *
-import time
 import logging
 import schedule
-from scheduler import Scheduler
 from telegram_bot import TelegramBot
 from utils import TelegramHandler, check_health
-from data_getter.models import User
+import threading
 
-class CryptoSniffer:
+
+class Sniffer:
 
     def __init__(self):
-        self.scheduler = Scheduler()
         self.telegram_bot = TelegramBot()
 
         log_formatter = logging.Formatter("%(asctime)s [%(threadName)s] [%(levelname)s]  %(message)s")
@@ -37,15 +35,15 @@ class CryptoSniffer:
         schedule.every(HEALTH_CHECK_INTERVAL).seconds.do(check_health)
 
     def start(self):
-        self.scheduler.start()
         self.telegram_bot.start()
         self.telegram_bot.send_all_admins('App launched. Status: ' + check_health()['status'])
 
+        print(list(threading.enumerate()))
+
     def stop(self):
-        self.scheduler.stop()
         self.telegram_bot.stop()
 
 
 if __name__ == "__main__":
-    sniffer = CryptoSniffer()
+    sniffer = Sniffer()
     sniffer.start()

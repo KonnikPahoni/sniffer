@@ -1,10 +1,13 @@
 import logging
 import requests
 from exceptions import GetRequestException, ObjectCreationException
+import abc
 
 
-class Getter:
+class Getter(abc.ABC):
+    # Url to retrieve objects from
     url = None
+
     response = None
     objects = []
 
@@ -13,34 +16,40 @@ class Getter:
     def __init__(self, timeout=TIMEOUT_DEFAULT):
         self.timeout = timeout
 
+    # Get raw data
     def get(self):
         try:
             request = requests.get(url=self.url, timeout=self.timeout)
             return request.json()
         except requests.exceptions.Timeout:
             logging.warning("Connection timeout")
+        except requests.exceptions.ConnectionError:
+            logging.warning("No connection")
         except Exception:
             raise GetRequestException
         return None
 
-    def save_to_cache(self):
-        pass
-
-    def add_to_queue(self):
-        pass
-
+    # Every data getter should implement create_objects()
     @staticmethod
-    def map():
-        return None
+    @abc.abstractmethod
+    def create_objects():
+        pass
 
     def invoke(self):
-        logging.info("invoke bfx")
+
+        # Getting raw data
         self.response = self.get()
+
         if self.response:
-            print("response received")
             try:
-                self.objects = list(self.map())
+
+                # Populating objects
+                self.objects = self.create_objects()
+
+                for object_ in self.objects:
+                    object_.save()
+
             except Exception:
                 raise ObjectCreationException
 
-            return self.objects
+        return self.objects

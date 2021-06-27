@@ -1,34 +1,46 @@
 version: '3.9'
 
 services:
-  database_data:
+  app:
+    container_name: sniffer_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: app_image
+    command: ./scripts/wait-for-it.sh db_front:${DB_PORT} --
+      sh -c "python manage.py migrate && python main.py"
+    volumes:
+      - ./var/app:/var/app
+      - ./data_getter:/data_getter
+      - ./telegram_bot.py:/telegram_bot.py
+    depends_on:
+      - db
+      - redis
+    deploy:
+      restart_policy:
+        condition: on-failure
+  db:
+    container_name: sniffer_db
     image: postgres:13
     environment:
-      POSTGRES_USER : "postgres"
-      POSTGRES_PASSWORD : "postgres"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
     volumes:
       - ./var/postgresql:/var/lib/postgresql/data
     ports:
       - "5432:5432"
   redis:
+    container_name: sniffer_redis
     image: "redis:alpine"
     volumes:
       - ./var/redis:/var/redis
     ports:
       - "6379:6379"
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: app_image
-    command: sh -c "python manage.py migrate
-      && python main.py"
-    volumes:
-      - ./var/app:/var/app
-    depends_on:
-      - database_data
-      - redis
+    deploy:
+      restart_policy:
+        condition: on-failure
   celery:
+    container_name: sniffer_celery
     image: app_image
     command: celery -A data_getter.celery worker -l info
     env_file:
@@ -36,10 +48,14 @@ services:
     volumes:
       - ./var/celery:/var/celery
     depends_on:
-      - database_data
+      - db
     links:
       - redis
+    deploy:
+      restart_policy:
+        condition: on-failure
   celery-beat:
+    container_name: sniffer_celery_beat
     image: app_image
     command: celery -A data_getter.celery beat -l info -S django_celery_beat.schedulers:DatabaseScheduler
     volumes:
@@ -47,6 +63,9 @@ services:
     env_file:
       - .env
     depends_on:
-      - database_data
+      - db
       - redis
       - app
+    deploy:
+      restart_policy:
+        condition: on-failure

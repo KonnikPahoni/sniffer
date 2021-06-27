@@ -31,5 +31,6 @@ class AdminSettings(models.Model):
 class GetterModel(models.Model):
     datetime = models.DateTimeField(auto_now_add=True, unique=True, db_index=True)
 
+
 # TODO: Import migrations from schemas AUTOMATICALLY
 from data_getter.schemas.bfx import *

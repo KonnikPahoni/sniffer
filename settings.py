@@ -4,7 +4,6 @@ import os
 import django
 from environs import Env
 
-
 sys.dont_write_bytecode = True
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
@@ -24,19 +23,13 @@ if os.path.exists(os.path.join(BASE_DIR, ".env")):
 
 CELERY_BROKER_URL = os.environ['CELERY_BROKER_URL']
 CELERY_RESULT_BACKEND = os.environ['CELERY_RESULT_BACKEND']
-CELERY_TASK_SERIALIZER = "pickle"
-CELERY_RESULT_SERIALIZER = 'pickle'
-CELERY_ACCEPT_CONTENT = ['pickle']
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
 CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_TIMEZONE = 'UTC'
 
-CELERYBEAT_SCHEDULE = {
-    'add-every-30-seconds': {
-        'task': 'bfx.add',
-        'schedule': 30.0,
-        'args': (16, 16)
-    },
-}
+BACKUP_DISTANCE = os.environ['BACKUP_DISTANCE']
 
 DATABASES = {
     'default': {

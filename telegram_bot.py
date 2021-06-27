@@ -1,3 +1,4 @@
+import telegram
 from telegram.ext import Updater, CommandHandler, ConversationHandler, MessageHandler, Filters
 import django.core.exceptions
 from data_getter.models import User, AdminSettings
@@ -167,8 +168,12 @@ class TelegramBot:
         log_file.close()
 
     def start(self):
-        self.updater.start_polling()
-        logging.info('Telegram bot started')
+        logging.info('Telegram bot starting')
+        while True:
+            try:
+                self.updater.start_polling()
+            except telegram.error.NetworkError:
+                logging.warning('No connection')
 
     def stop(self):
         self.updater.stop()
