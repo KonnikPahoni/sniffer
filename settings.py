@@ -29,7 +29,12 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_TIMEZONE = 'UTC'
 
+TIME_ZONE = 'UTC'
+
 BACKUP_DISTANCE = os.environ['BACKUP_DISTANCE']
+BUCKET_NAME = os.environ['BUCKET_NAME']
+SPACES_ENDPOINT_URL = os.environ['SPACES_ENDPOINT_URL']
+REGION_NAME = os.environ['REGION_NAME']
 
 DATABASES = {
     'default': {

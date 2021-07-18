@@ -38,8 +38,6 @@ class Sniffer:
         self.telegram_bot.start()
         self.telegram_bot.send_all_admins('App launched. Status: ' + check_health()['status'])
 
-        print(list(threading.enumerate()))
-
     def stop(self):
         self.telegram_bot.stop()
 

@@ -7,12 +7,16 @@ services:
       context: .
       dockerfile: Dockerfile
     image: app_image
-    command: ./scripts/wait-for-it.sh db_front:${DB_PORT} --
+    command: ./scripts/wait-for-it.sh db:${DB_PORT} --
       sh -c "python manage.py migrate && python main.py"
     volumes:
-      - ./var/app:/var/app
+      - ./var:/var
       - ./data_getter:/data_getter
       - ./telegram_bot.py:/telegram_bot.py
+      - ./utils.py:/utils.py
+      - ./.env:/.env
+      - ./exceptions.py:/exceptions.py
+      - ./main.py:/main.py
     depends_on:
       - db
       - redis
@@ -42,12 +46,14 @@ services:
   celery:
     container_name: sniffer_celery
     image: app_image
-    command: celery -A data_getter.celery worker -l info
+    command: ./scripts/wait-for-it.sh db:${DB_PORT} --
+      sh -c "celery -A data_getter.celery worker -l info"
     env_file:
       - .env
     volumes:
       - ./var/celery:/var/celery
     depends_on:
+      - app
       - db
     links:
       - redis
@@ -57,15 +63,17 @@ services:
   celery-beat:
     container_name: sniffer_celery_beat
     image: app_image
-    command: celery -A data_getter.celery beat -l info -S django_celery_beat.schedulers:DatabaseScheduler
+    command: ./scripts/wait-for-it.sh db:${DB_PORT} --
+      sh -c "celery -A data_getter.celery beat -l info -S django_celery_beat.schedulers:DatabaseScheduler"
     volumes:
-      - ./var/celery-beat:/var/celery-beat
+      - ./var:/var
     env_file:
       - .env
     depends_on:
       - db
       - redis
       - app
+      - celery
     deploy:
       restart_policy:
         condition: on-failure
