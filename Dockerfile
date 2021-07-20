@@ -1,8 +1,15 @@
 FROM python:3
 
-
 WORKDIR /
+
 COPY requirements.txt /
+
 RUN pip3 install -r requirements.txt
-EXPOSE 5432
+
 COPY . /
+
+ENV TZ "UTC"
+
+RUN echo "UTC" > /etc/timezone
+RUN echo "UTC" > /etc/localtime
+RUN dpkg-reconfigure -f noninteractive tzdata

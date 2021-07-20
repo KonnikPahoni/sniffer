@@ -40,22 +40,13 @@ python3 manage.py migrate
 python manage.py collectstatic
 ```
 
-### To update the website:
+### To purge the queue:
 
 ```
-python update.py
+docker container exec -it sniffer_celery celery -A celery purge -f
 ```
 
-### To retrieve Google Sentiment for reviews:
+### TODO:
 
-```
-python analyze_reviews.py
-```
-
-### Retrieving Let’s Encrypt certificate (one-time action)
-
-- Run server in http mode
-- Run `./init-letsencrypt.sh` from the project folder (outside docker)
-- Add https configuration to nginx
-
-## TODO
+- Cex tickers https://cex.io/api/tickers/USD
+- Trip reports parsing

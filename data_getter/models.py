@@ -1,5 +1,6 @@
 from django.db import models
 from logging import WARNING
+from data_getter.schemas import *
 
 
 class User(models.Model):
@@ -26,11 +27,3 @@ class Dataset(models.Model):
 class AdminSettings(models.Model):
     user = models.OneToOneField('User', on_delete=models.CASCADE, primary_key=True)
     logging_level = models.SmallIntegerField(default=WARNING)
-
-
-class GetterModel(models.Model):
-    datetime = models.DateTimeField(auto_now_add=True, unique=True, db_index=True)
-
-
-# TODO: Import migrations from schemas AUTOMATICALLY
-from data_getter.schemas.bfx import *

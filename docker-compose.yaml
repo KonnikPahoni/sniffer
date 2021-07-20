@@ -1,71 +1,88 @@
 version: '3.9'
 
 services:
+  db:
+    container_name: sniffer_db
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./var/postgresql:/var/lib/postgresql/data
+    ports:
+      - ${DB_PORT}:5432
+    env_file:
+      - .env
+    deploy:
+      restart_policy:
+        condition: on-failure
+    restart: unless-stopped
+  redis:
+    container_name: sniffer_redis
+    image: "redis:alpine"
+    volumes:
+      - ./var/redis:/var/redis
+    deploy:
+      restart_policy:
+        condition: on-failure
+    restart: unless-stopped
   app:
     container_name: sniffer_app
     build:
       context: .
       dockerfile: Dockerfile
     image: app_image
-    command: ./scripts/wait-for-it.sh db_front:${DB_PORT} --
+    command: ./scripts/wait-for-it.sh db:${DB_PORT} --
       sh -c "python manage.py migrate && python main.py"
     volumes:
-      - ./var/app:/var/app
+      - ./var:/var
       - ./data_getter:/data_getter
       - ./telegram_bot.py:/telegram_bot.py
+      - ./utils.py:/utils.py
+      - ./.env:/.env
+      - ./exceptions.py:/exceptions.py
+      - ./main.py:/main.py
     depends_on:
       - db
       - redis
     deploy:
       restart_policy:
         condition: on-failure
-  db:
-    container_name: sniffer_db
-    image: postgres:13
-    environment:
-      POSTGRES_USER: "postgres"
-      POSTGRES_PASSWORD: "postgres"
-    volumes:
-      - ./var/postgresql:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-  redis:
-    container_name: sniffer_redis
-    image: "redis:alpine"
-    volumes:
-      - ./var/redis:/var/redis
-    ports:
-      - "6379:6379"
-    deploy:
-      restart_policy:
-        condition: on-failure
+    restart: unless-stopped
   celery:
     container_name: sniffer_celery
     image: app_image
-    command: celery -A data_getter.celery worker -l info
+    command: ./scripts/wait-for-it.sh db:5432 --
+      sh -c "celery -A data_getter.celery worker -l info"
     env_file:
       - .env
     volumes:
       - ./var/celery:/var/celery
     depends_on:
+      - app
       - db
     links:
       - redis
     deploy:
       restart_policy:
         condition: on-failure
+    restart: unless-stopped
   celery-beat:
     container_name: sniffer_celery_beat
     image: app_image
-    command: celery -A data_getter.celery beat -l info -S django_celery_beat.schedulers:DatabaseScheduler
+    command: ./scripts/wait-for-it.sh db:5432 --
+      sh -c "celery -A data_getter.celery beat -l info -S django_celery_beat.schedulers:DatabaseScheduler"
     volumes:
-      - ./var/celery-beat:/var/celery-beat
+      - ./var:/var
     env_file:
       - .env
     depends_on:
       - db
       - redis
       - app
+      - celery
     deploy:
       restart_policy:
         condition: on-failure
+    restart: unless-stopped

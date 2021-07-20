@@ -29,7 +29,12 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 CELERY_TIMEZONE = 'UTC'
 
+TIME_ZONE = 'UTC'
+
 BACKUP_DISTANCE = os.environ['BACKUP_DISTANCE']
+BUCKET_NAME = os.environ['BUCKET_NAME']
+SPACES_ENDPOINT_URL = os.environ['SPACES_ENDPOINT_URL']
+REGION_NAME = os.environ['REGION_NAME']
 
 DATABASES = {
     'default': {
@@ -38,11 +43,11 @@ DATABASES = {
         'USER': os.environ.get('DB_USER'),
         'PASSWORD': os.environ.get('DB_PASS'),
         'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT')
+        'PORT': 5432
     }
 }
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', os.environ['APP_HOST']]
 
 if not os.path.isdir(os.path.join(BASE_DIR, 'var')):
     os.mkdir(os.path.join(BASE_DIR, 'var'))
@@ -60,8 +65,6 @@ CONFIGURED_THREADS = [APP_CORE_NAME,
                       'APScheduler',
                       'Bot:' + str(TELEGRAM_BOT_ID) + ':dispatcher',
                       'Bot:' + str(TELEGRAM_BOT_ID) + ':updater']
-
-CEX_TICKERS_URL = "https://cex.io/api/tickers/USD"
 
 REQUEST_TIMEOUT = 10
 TICKER_INTERVAL = 60

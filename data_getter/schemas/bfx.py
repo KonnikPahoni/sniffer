@@ -1,8 +1,8 @@
 from django.db import models
-from data_getter.models import GetterModel
 
 
-class BFXTickerTradingModel(GetterModel):
+class BFXTickerTradingModel(models.Model):
+    datetime = models.DateTimeField(auto_now_add=True, unique=True, db_index=True)
     symbol = models.CharField(max_length=255)
     bid = models.FloatField(null=True, blank=True)
     bid_size = models.FloatField(null=True, blank=True)
@@ -16,7 +16,8 @@ class BFXTickerTradingModel(GetterModel):
     low = models.FloatField(null=True, blank=True)
 
 
-class BFXTickerFundingModel(GetterModel):
+class BFXTickerFundingModel(models.Model):
+    datetime = models.DateTimeField(auto_now_add=True, unique=True, db_index=True)
     symbol = models.CharField(max_length=255)
     frr = models.FloatField(null=True, blank=True)
     bid = models.FloatField(null=True, blank=True)
