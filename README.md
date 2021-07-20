@@ -46,3 +46,7 @@ python manage.py collectstatic
 docker container exec -it sniffer_celery celery -A celery purge -f
 ```
 
+### TODO:
+
+- Cex tickers https://cex.io/api/tickers/USD
+- Trip reports parsing
