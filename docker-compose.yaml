@@ -33,7 +33,7 @@ services:
       context: .
       dockerfile: Dockerfile
     image: app_image
-    command: ./scripts/wait-for-it.sh db:${DB_PORT} --
+    command: ./scripts/wait-for-it.sh db:5432 --
       sh -c "python manage.py migrate && python main.py"
     volumes:
       - ./var:/var
