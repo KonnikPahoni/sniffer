@@ -1,6 +1,7 @@
 from django.db import models
 from logging import WARNING
 from data_getter.schemas import *
+from settings import *
 
 
 class User(models.Model):
