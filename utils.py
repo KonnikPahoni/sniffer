@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 import threading
@@ -5,13 +6,11 @@ from django.core import serializers
 import boto3
 import pytz
 import inspect
-
 import data_getter
-from data_getter.schemas.bfx import BFXTickerTradingModel, BFXTickerFundingModel
-from settings import CONFIGURED_THREADS, REGION_NAME, SPACES_ENDPOINT_URL, BUCKET_NAME
+from data_getter.schemas.bfx import BFXTickerTradingModel
+from settings import CONFIGURED_THREADS, REGION_NAME, SPACES_ENDPOINT_URL, BUCKET_NAME, UPLOAD_FOLDER_NAME
 import os
 import datetime as dt
-import glob2 as glob
 
 
 def format_output(obj, as_string=False):
@@ -67,9 +66,8 @@ def dump(date):
     for model in models:
         filename = "var/celery/" + model.__name__ + "/" + date + ".json"
 
-        timezone = pytz.timezone('UTC')
-        today = dt.datetime.now(tz=timezone) - dt.timedelta(days=1)
-        start = today.replace(hour=0, minute=0, second=0, microsecond=0)
+        start = datetime.datetime.strptime(date, '%Y-%m-%d').replace(tzinfo=pytz.UTC)
+
         end = start + dt.timedelta(days=1)
 
         objects = model.objects.filter(datetime__gte=start, datetime__lte=end)
@@ -95,7 +93,7 @@ def dump(date):
                                 aws_secret_access_key=os.getenv('SPACES_SECRET'))
 
         filesize = os.path.getsize(filename)
-        s3_filename = BUCKET_NAME + '/' + model.__name__ + '/' + date + ".json"
+        s3_filename = UPLOAD_FOLDER_NAME + '/' + model.__name__ + '/' + date + ".json"
         print('Uploading file ' + filename + ' (' + '{:.3f}'.format(filesize / 1000 / 1000) + ' MB)')
         client.upload_file(filename, BUCKET_NAME, s3_filename)
 
