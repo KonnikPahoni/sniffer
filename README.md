@@ -40,6 +40,18 @@ python3 manage.py migrate
 python manage.py collectstatic
 ```
 
+### To dump objects for the specified date to S3 and remove from Django database
+
+```
+python manage.py dump 2012-12-21 --delete
+```
+
+### To dump all objects to S3 and remove from Django database
+
+```
+python manage.py dumpall
+```
+
 ### To purge the queue:
 
 ```
