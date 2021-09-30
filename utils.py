@@ -73,7 +73,7 @@ def dump(date, remove=False):
         objects = model.objects.filter(datetime__gte=start, datetime__lte=end)
 
         if len(objects) == 0:
-            print('No ' + model.__name__ + ' data for ' + date)
+            logging.info('No ' + model.__name__ + ' data for ' + date)
             continue
 
         data = serializers.serialize("json", objects)
