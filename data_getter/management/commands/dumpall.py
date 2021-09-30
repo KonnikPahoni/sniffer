@@ -1,7 +1,5 @@
-import logging
-
 from django.core.management.base import BaseCommand
-from utils import dump, get_models
+from utils import get_models
 import datetime
 from django.core.management import call_command
 
