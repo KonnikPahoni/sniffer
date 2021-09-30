@@ -112,6 +112,9 @@ def dump(date, remove=False):
             logging.info(model.__name__ + ' dump for ' + date + ' uploaded. Size: ' + str(
                 filesize / 1000 / 1000) + ' MB')
 
+            # Removing temporary object from disc
+            os.remove(filename)
+
             # Removing objects from Django (!)
             if remove:
                 objects.delete()
