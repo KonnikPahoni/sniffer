@@ -61,7 +61,7 @@ def get_models():
     return models
 
 
-def dump(date):
+def dump(date, remove=False):
     models = get_models()
     for model in models:
         filename = "var/celery/" + model.__name__ + "/" + date + ".json"
@@ -111,3 +111,7 @@ def dump(date):
             print('Object size verified. ' + model.__name__ + ' upload finished.')
             logging.info(model.__name__ + ' dump for ' + date + ' uploaded. Size: ' + str(
                 filesize / 1000 / 1000) + ' MB')
+
+            # Removing objects from Django (!)
+            if remove:
+                objects.delete()
