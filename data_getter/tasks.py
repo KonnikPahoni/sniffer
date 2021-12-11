@@ -10,7 +10,7 @@ import datetime as dt
 
 @celery_app.on_after_finalize.connect
 def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(30,
+    sender.add_periodic_task(60 * 10,
                              bfx_ticker.s(),
                              name='Bitfinex ticker')
 
