@@ -26,7 +26,6 @@ def setup_periodic_tasks(sender, **kwargs):
 @celery_app.task()
 def dump_database(date):
     dump(date)
-    logging
 
 
 @celery_app.task()
